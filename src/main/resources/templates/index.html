@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>RentFix — Premium Real Estate Management</title>
+
+    <!-- Global Styles -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body class="home-page">
+
+<div class="home-hero-wrapper">
+    <div class="home-hero-card">
+
+        <!-- Welcome -->
+        <div class="home-welcome">
+            <h2>Welcome to RentFix</h2>
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="home-title">Smarter Property Management</h1>
+
+        <!-- Divider -->
+        <div class="home-divider"></div>
+
+        <!-- Description -->
+        <p class="home-subtitle">
+            RentFix helps owners and tenants stay connected with real-time rental updates,
+            maintenance tracking, digital contracts, and a clean, modern dashboard —
+            built for today’s real estate market.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="home-cta-group">
+            <a th:href="@{/auth/login}" class="btn-auth-submit home-cta">Login</a>
+            <a th:href="@{/auth/register}" class="btn-auth-submit home-cta">Create Account</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

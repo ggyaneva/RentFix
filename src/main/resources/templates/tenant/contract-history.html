@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Contract History - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Your Contract History</h1>
+            <p class="text-secondary">All past rental agreements</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>City</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Rent</th>
+                        <th>Payments</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="c : ${history}">
+                        <td th:text="${c.property.title}"></td>
+                        <td th:text="${c.property.city}"></td>
+                        <td th:text="${c.startDate}"></td>
+                        <td th:text="${c.endDate}"></td>
+                        <td th:text="${c.monthlyRent + ' €'}"></td>
+                        <td>
+                            <a th:href="@{'/tenant/payments?property=' + ${c.property.id}}"
+                               class="btn btn-primary btn-sm">
+                                Payments
+                            </a>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

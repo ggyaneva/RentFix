@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Admin Dashboard - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1>Admin Dashboard</h1>
+            <p class="text-secondary">
+                Manage users, properties, contracts and payments.
+            </p>
+
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="page-section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.5rem;">
+
+            <div class="card">
+                <h4 class="card-title">Users</h4>
+                <p class="text-secondary">Total registered users</p>
+                <h2 th:text="${users.size()}"></h2>
+                <a class="btn btn-primary mt-2" th:href="@{/admin/users}">Manage Users</a>
+            </div>
+
+            <div class="card">
+                <h4 class="card-title">Properties</h4>
+                <p class="text-secondary">Active properties in the system</p>
+                <h2 th:text="${properties.size()}"></h2>
+                <a class="btn btn-primary mt-2" th:href="@{/admin/properties}">View Properties</a>
+            </div>
+
+            <div class="card">
+                <h4 class="card-title">Contracts</h4>
+                <p class="text-secondary">Total rental contracts</p>
+                <h2 th:text="${contracts.size()}"></h2>
+                <a class="btn btn-primary mt-2" th:href="@{/admin/contracts}">View Contracts</a>
+            </div>
+
+            <div class="card">
+                <h4 class="card-title">Payments</h4>
+                <p class="text-secondary">Processed monthly payments</p>
+                <h2 th:text="${payments.size()}"></h2>
+                <a class="btn btn-primary mt-2" th:href="@{/admin/payments}">View Payments</a>
+            </div>
+
+        </div>
+
+        <!-- USERS TABLE PREVIEW -->
+        <div class="page-section">
+            <h3>Latest Users</h3>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.username}"></td>
+                        <td th:text="${u.email}"></td>
+                        <td><span class="badge" th:text="${u.role}"></span></td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Property Contracts - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1 th:text="${property.title}"></h1>
+            <p class="text-secondary">
+                All rental contracts for this property
+            </p>
+        </div>
+
+        <!-- CONTRACTS TABLE -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Rent (€)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="c : ${contracts}">
+
+                    <!-- TENANT NAME -->
+                    <td th:text="${c.tenant.getFirstName() + ' ' + c.tenant.lastName}"></td>
+
+                    <!-- START DATE -->
+                    <td th:text="${c.startDate}"></td>
+
+                    <!-- END DATE -->
+                    <td th:text="${c.endDate != null ? c.endDate : '—'}"></td>
+
+                    <!-- MONTHLY RENT -->
+                    <td th:text="${c.monthlyRent}"></td>
+
+                    <!-- STATUS BADGE -->
+                    <td>
+                        <span th:if="${c.active}"
+                              class="badge badge-success">Active</span>
+
+                        <span th:if="${!c.active}"
+                              class="badge badge-secondary">Ended</span>
+                    </td>
+
+                    <!-- ACTION BUTTONS -->
+                    <td>
+                        <div style="display:flex; gap:0.5rem;">
+
+                            <!-- Payments -->
+                            <a class="btn btn-sm btn-primary"
+                               th:href="@{/owner/property/payments/{id}(id=${property.id})}">
+                                Payments
+                            </a>
+
+                            <!-- Cancel Contract (only if active) -->
+                            <form th:if="${c.active}"
+                                  th:action="@{/contracts/cancel/{id}(id=${c.id})}"
+                                  method="post"
+                                  style="display:inline-block;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button class="btn btn-sm btn-danger">Cancel</button>
+                            </form>
+
+                        </div>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <a class="btn btn-outline-light mt-3" th:href="@{/owner/dashboard}">
+            Back to Dashboard
+        </a>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

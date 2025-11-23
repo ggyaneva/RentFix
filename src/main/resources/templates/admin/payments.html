@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>All Payments - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>All Payments</h1>
+            <p class="text-secondary">View all payments made by tenants for rented properties.</p>
+            <a class="admin-back-btn" th:href="@{/admin/dashboard}">
+                ← Back
+            </a>
+
+        </div>
+
+        <!-- Payments Table -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Owner</th>
+                    <th>Tenant</th>
+                    <th>Amount (€)</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="p : ${payments}">
+                    <!-- Property -->
+                    <td th:text="${p.contract.property.title}"></td>
+
+                    <!-- Owner -->
+                    <td th:text="${p.contract.property.owner.username}"></td>
+
+                    <!-- Tenant -->
+                    <td th:text="${p.contract.tenant.username}"></td>
+
+                    <!-- Amount -->
+                    <td th:text="${p.amount}"></td>
+
+                    <!-- Date -->
+                    <td th:text="${p.dueDate}"></td>
+
+                    <!-- Payment Status -->
+                    <td>
+                        <span class="badge"
+                              th:text="${p.status}">
+                        </span>
+                    </td>
+
+                    <!-- Delete -->
+                    <td>
+                        <form th:action="@{/admin/payment/delete/{id}(id=${p.id})}"
+                              method="post" style="display:inline-block;">
+                            <input type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}"/>
+                            <button class="btn btn-sm btn-danger" type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+</body>
+</html>

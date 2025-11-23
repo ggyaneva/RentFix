@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Property Payments - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1 th:text="${property.title}"></h1>
+            <p class="text-secondary">Payment history for this property</p>
+        </div>
+
+        <!-- PAYMENTS TABLE -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Amount (€)</th>
+                    <th>Due Date</th>
+                    <th>Paid At</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="payment : ${payments}">
+
+                    <!-- Tenant name -->
+                    <td th:text="${payment.contract.tenant.firstName + ' ' + payment.contract.tenant.lastName}">
+                    </td>
+
+                    <!-- Amount -->
+                    <td th:text="${payment.amount}"></td>
+
+                    <!-- Due date -->
+                    <td th:text="${payment.dueDate}"></td>
+
+                    <!-- Paid At -->
+                    <td th:text="${payment.paidAt != null ? payment.paidAt : '—'}"></td>
+
+                    <!-- Status Badge -->
+                    <td>
+                        <span th:if="${payment.status == 'SUCCESS'}" class="badge badge-success">
+                            Paid
+                        </span>
+
+                        <span th:if="${payment.status == 'PENDING'}" class="badge badge-warning">
+                            Pending
+                        </span>
+
+                        <span th:if="${payment.status == 'FAILED'}" class="badge badge-danger">
+                            Failed
+                        </span>
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="5" class="text-center text-secondary">
+                        No payments found for this property.
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Back Button -->
+        <a class="btn btn-outline-light mt-3" th:href="@{/owner/dashboard}">
+            Back to Dashboard
+        </a>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

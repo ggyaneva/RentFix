@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Create Contract - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Create Rental Contract</h1>
+            <p class="text-secondary">Review property details and confirm your rental contract.</p>
+        </div>
+
+        <div class="details-layout">
+
+            <!-- LEFT SIDE — PROPERTY INFORMATION -->
+            <div class="card">
+                <h3 class="card-title">Property Information</h3>
+
+                <div class="details-grid">
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Title:</strong></p>
+                        <p th:text="${property.title}"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-secondary mb-1"><strong>City:</strong></p>
+                        <p th:text="${property.city}"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Address:</strong></p>
+                        <p th:text="${property.address}"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Bedrooms:</strong></p>
+                        <p th:text="${property.bedrooms}"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Monthly Rent:</strong></p>
+                        <p th:text="${property.monthlyRent} + ' €'"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Owner:</strong></p>
+                        <p th:text="${property.owner.username}"></p>
+                    </div>
+                </div>
+
+                <div th:if="${property.description != null && !property.description.isEmpty()}"
+                     class="details-description">
+                    <p class="text-secondary mb-1"><strong>Description:</strong></p>
+                    <p th:text="${property.description}"></p>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE — CONTRACT FORM -->
+            <div class="card">
+
+                <h3 class="card-title" style="margin-bottom: 1.5rem;">Confirm Contract</h3>
+
+                <form th:action="@{/contracts/create/{id}(id=${property.id})}"
+                      th:object="${contractRequest}"
+                      method="post">
+
+                    <!-- START DATE ONLY -->
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-control" th:field="*{startDate}" required>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                        <button type="submit"
+                                class="btn btn-primary w-100"
+                                style="margin-bottom: 1rem;">
+                            Confirm & Create Contract
+                        </button>
+
+                        <a th:href="@{/properties/{id}(id=${property.id})}"
+                           class="btn btn-secondary w-100">
+                            Cancel
+                        </a>
+                    </div>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Tenant Dashboard - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1>Your Rental Dashboard</h1>
+            <p class="text-secondary">Manage your home, contracts, and payments.</p>
+        </div>
+
+        <!-- NO ACTIVE CONTRACT -->
+        <div th:if="${activeContract == 0 || activeContract == null}" class="page-section">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">No Active Contract</h3>
+
+                    <p class="text-secondary mb-3">
+                        You currently do not have an active rental agreement.
+                        Browse available properties and rent a new home.
+                    </p>
+
+                    <a class="btn btn-primary" th:href="@{/properties}">
+                        Browse Properties
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVE CONTRACT -->
+        <div th:if="${activeContract != null}" class="page-section">
+
+            <div class="card center-card">
+                <div class="card-body">
+
+                    <h3 class="card-title mb-4">Your Active Contract</h3>
+
+                    <!-- CONTRACT INFO GRID -->
+                    <div class="contract-info-grid">
+
+                        <div>
+                            <p class="label">Property:</p>
+                            <p class="value" th:text="${activeContract.property.title}"></p>
+                        </div>
+
+                        <div>
+                            <p class="label">City:</p>
+                            <p class="value" th:text="${activeContract.property.city}"></p>
+                        </div>
+
+                        <div>
+                            <p class="label">Address:</p>
+                            <p class="value" th:text="${activeContract.property.address}"></p>
+                        </div>
+
+                        <div>
+                            <p class="label">Monthly Rent:</p>
+                            <p class="value" th:text="${activeContract.monthlyRent + ' €'}"></p>
+                        </div>
+
+                        <div>
+                            <p class="label">Start Date:</p>
+                            <p class="value" th:text="${activeContract.startDate}"></p>
+                        </div>
+
+                        <div th:if="${activeContract.endDate != null}">
+                            <p class="label">End Date:</p>
+                            <p class="value" th:text="${activeContract.endDate}"></p>
+                        </div>
+
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="contract-actions">
+
+                        <!-- Payment History -->
+                        <a class="btn btn-primary" th:href="@{/tenant/payments}">
+                            Payment History
+                        </a>
+
+                        <!-- Contract History -->
+                        <a class="btn btn-secondary" th:href="@{/contracts/history}">
+                            Contract History
+                        </a>
+
+                        <!-- Cancel Contract -->
+                        <form th:action="@{/contracts/cancel/{id}(id=${activeContract.id})}"
+                              method="post">
+
+                            <input type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}" />
+
+                            <button class="btn btn-danger" type="submit">
+                                Move Out (Cancel Contract)
+                            </button>
+                        </form>
+
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    </div>
+
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

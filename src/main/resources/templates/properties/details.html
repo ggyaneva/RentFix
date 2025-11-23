@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+    <title th:text="${property.title} + ' - RentFix'">Property Details</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+        <div th:if="${error}" class="alert alert-danger" style="margin-bottom:2rem;">
+            <p th:text="${error}"></p>
+        </div>
+
+        <div class="page-header">
+            <h1 th:text="${property.title}"></h1>
+            <p class="text-secondary" th:text="${property.city}"></p>
+        </div>
+
+        <!-- GALLERY -->
+        <!-- MAIN GALLERY -->
+        <div class="details-gallery" th:if="${property.imageUrls != null}">
+
+            <!-- BIG IMAGE -->
+            <div class="main-image-wrapper">
+                <img id="main-image"
+                     th:src="${property.imageUrls[0]}"
+                     class="main-image"
+                     alt="Property Image">
+            </div>
+
+            <!-- THUMBNAILS -->
+            <div class="thumbnail-row">
+                <img th:each="img : ${property.imageUrls}"
+                     th:src="${img}"
+                     class="thumbnail-image"
+                     onclick="document.getElementById('main-image').src = this.src;" >
+            </div>
+
+        </div>
+
+
+        <div class="details-layout">
+
+            <!-- LEFT CONTENT -->
+            <div class="details-main card">
+                <h3 class="card-title">Property Information</h3>
+
+                <div class="details-grid">
+
+                    <div><p class="text-secondary mb-1"><strong>City:</strong></p>
+                        <p th:text="${property.city}"></p></div>
+
+                    <div><p class="text-secondary mb-1"><strong>Address:</strong></p>
+                        <p th:text="${property.address}"></p></div>
+
+                    <div><p class="text-secondary mb-1"><strong>Bedrooms:</strong></p>
+                        <p th:text="${property.bedrooms}"></p></div>
+
+                    <div><p class="text-secondary mb-1"><strong>Bathrooms:</strong></p>
+                        <p th:text="${property.bathrooms}"></p></div>
+
+                    <div><p class="text-secondary mb-1"><strong>Area:</strong></p>
+                        <p th:text="${property.areaSqm} + ' sqm'"></p></div>
+
+                    <div><p class="text-secondary mb-1"><strong>Monthly Rent:</strong></p>
+                        <p th:text="${property.monthlyRent} + ' €'"></p></div>
+
+                    <!-- STATUS BADGE -->
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Status:</strong></p>
+
+                        <span th:classappend="${property.status.name() == 'AVAILABLE'} ? 'badge-available' : 'badge-rented'"
+                              th:text="${property.status}">
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div th:if="${property.description != null && !property.description.isEmpty()}"
+                     class="details-description">
+                    <p class="text-secondary mb-1"><strong>Description:</strong></p>
+                    <p th:text="${property.description}"></p>
+                </div>
+            </div>
+
+            <!-- RIGHT RENT BOX (TENANT ONLY) -->
+            <div class="details-sidebar card">
+
+                <div class="rent-box" sec:authorize="hasRole('TENANT')">
+
+                    <h4 class="card-title">Rent This Property</h4>
+                    <p class="text-secondary mb-3">Create a rental contract and move in.</p>
+
+                    <!-- ALREADY RENTED BY SOMEONE ELSE -->
+                    <button class="btn btn-secondary w-100"
+                            th:if="${property.status.name() == 'RENTED'}"
+                            disabled>
+                        Already Rented
+                    </button>
+
+                    <!-- TENANT ALREADY HAS CONTRACT -->
+                    <button class="btn btn-secondary w-100"
+                            th:if="${hasActiveContract}"
+                            disabled>
+                        You already have an active contract
+                    </button>
+
+                    <!-- ALLOWED TO RENT -->
+                    <a class="btn btn-primary w-100"
+                       th:if="${property.status.name() == 'AVAILABLE' and !hasActiveContract}"
+                       th:href="@{/contracts/create/{id}(id=${property.id})}">
+                        Create Rental Contract
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+
+
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Browse Properties - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1>Browse Properties</h1>
+            <p class="text-secondary">Find the perfect rental property</p>
+        </div>
+
+        <!-- SEARCH FILTERS -->
+        <div class="card filter-card">
+            <form th:action="@{/properties}" method="get">
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" name="city"
+                               class="form-control"
+                               th:value="${param.city}"
+                               placeholder="Enter city">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Keyword</label>
+                        <input type="text" name="keyword"
+                               class="form-control"
+                               th:value="${param.keyword}"
+                               placeholder="Title, address...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Min Bedrooms</label>
+                        <input type="number" name="minBedrooms"
+                               class="form-control"
+                               th:value="${param.minBedrooms}"
+                               placeholder="Min">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Max Bedrooms</label>
+                        <input type="number" name="maxBedrooms"
+                               class="form-control"
+                               th:value="${param.maxBedrooms}"
+                               placeholder="Max">
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    <a class="btn btn-outline-light" th:href="@{/properties}">Reset</a>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- NO RESULTS -->
+        <div th:if="${properties != null and properties.size() == 0}"
+             class="alert alert-info" style="margin-top: 2rem;">
+            No properties found. Try different filters.
+        </div>
+
+        <!-- PROPERTY LIST -->
+        <div class="property-grid" th:if="${properties != null && properties.size() > 0}">
+
+            <div class="property-card card" th:each="p : ${properties}">
+                <div class="property-card-content">
+
+                    <h3 class="property-title" th:text="${p.title}"></h3>
+                    <p class="property-city" th:text="${p.city}"></p>
+
+                    <div class="property-info-row">
+                        <span><strong>Bedrooms:</strong> <span th:text="${p.bedrooms}"></span></span>
+                        <span><strong>Bathrooms:</strong> <span th:text="${p.bathrooms}"></span></span>
+                    </div>
+
+                    <p class="rent-price">
+                        <strong th:text="${p.monthlyRent}"></strong> €/month
+                    </p>
+
+                    <!-- STATUS BADGE -->
+                    <p>
+                        <span th:classappend="${p.status.name() == 'AVAILABLE'} ? 'badge-available' : 'badge-rented'"
+                              th:text="${p.status}">
+                        </span>
+                    </p>
+
+                </div>
+
+                <div class="property-card-footer">
+                    <a class="btn btn-primary w-100"
+                       th:href="@{/properties/{id}(id=${p.id})}">
+                        View Details
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>
