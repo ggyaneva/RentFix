@@ -73,7 +73,17 @@
         <!-- PROPERTY LIST -->
         <div class="property-grid" th:if="${properties != null && properties.size() > 0}">
 
+
             <div class="property-card card" th:each="p : ${properties}">
+
+                <!-- IMAGE -->
+                <div class="property-image-wrapper" th:if="${p.imageUrls != null}">
+                    <img class="property-image"
+                         th:src="${p.imageUrls[0]}"
+                         alt="Property Image">
+                </div>
+
+                <!-- CONTENT -->
                 <div class="property-card-content">
 
                     <h3 class="property-title" th:text="${p.title}"></h3>
@@ -81,6 +91,7 @@
 
                     <div class="property-info-row">
                         <span><strong>Bedrooms:</strong> <span th:text="${p.bedrooms}"></span></span>
+                        <span class="info-separator">•</span>
                         <span><strong>Bathrooms:</strong> <span th:text="${p.bathrooms}"></span></span>
                     </div>
 
@@ -88,25 +99,14 @@
                         <strong th:text="${p.monthlyRent}"></strong> €/month
                     </p>
 
-                    <!-- STATUS BADGE -->
-                    <p>
-                        <span th:classappend="${p.status.name() == 'AVAILABLE'} ? 'badge-available' : 'badge-rented'"
-                              th:text="${p.status}">
-                        </span>
-                    </p>
-
-                </div>
-
-                <div class="property-card-footer">
-                    <a class="btn btn-primary w-100"
+                    <a class="btn btn-primary w-100 view-details-btn"
                        th:href="@{/properties/{id}(id=${p.id})}">
                         View Details
                     </a>
+
                 </div>
             </div>
-
         </div>
-
     </div>
 </div>
 

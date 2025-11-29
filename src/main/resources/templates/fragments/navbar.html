@@ -29,7 +29,7 @@
             <li sec:authorize="hasRole('TENANT')">
                 <a th:href="@{/tenant/contract-history}"
                    class="nav-link"
-                   th:classappend="${currentPath != null and currentPath.startsWith('/tenant')} ? ' active'">
+                   th:classappend="${currentPath != null and currentPath.startsWith('/tenant/contract-history')} ? ' active'">
                     History
                 </a>
             </li>
@@ -39,7 +39,7 @@
             <li sec:authorize="hasRole('TENANT')">
                 <a th:href="@{/tenant/dashboard}"
                    class="nav-link"
-                   th:classappend="${currentPath != null and currentPath.startsWith('/tenant')} ? ' active'">
+                   th:classappend="${currentPath != null and currentPath.startsWith('/tenant/dashboard')} ? ' active'">
                     Tenant Dashboard
                 </a>
             </li>

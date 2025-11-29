@@ -3,6 +3,7 @@
 <head>
     <title>All Payments - RentFix</title>
     <th:block th:replace="~{fragments/header :: head}"></th:block>
+
 </head>
 
 <body>
@@ -18,7 +19,6 @@
             <a class="admin-back-btn" th:href="@{/admin/dashboard}">
                 ← Back
             </a>
-
         </div>
 
         <!-- Payments Table -->
@@ -51,37 +51,75 @@
                     <td th:text="${p.amount}"></td>
 
                     <!-- Date -->
-                    <td th:text="${p.dueDate}"></td>
+                    <td th:text="${#temporals.format(p.dueDate, 'dd MMM yyyy')}"></td>
 
                     <!-- Payment Status -->
                     <td>
-                        <span class="badge"
-                              th:text="${p.status}">
-                        </span>
+                        <span class="badge" th:text="${p.status}"></span>
                     </td>
 
-                    <!-- Delete -->
+                    <!-- Correct button -->
                     <td>
-                        <form th:action="@{/admin/payment/delete/{id}(id=${p.id})}"
-                              method="post" style="display:inline-block;">
-                            <input type="hidden"
-                                   th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}"/>
-                            <button class="btn btn-sm btn-danger" type="submit">
-                                Delete
-                            </button>
-                        </form>
+                        <label for="payment-edit-toggle"
+                               class="btn btn-sm btn-primary"
+                               th:attr="data-id=${p.id}"
+                               onclick="document.getElementById('paymentId').value=this.getAttribute('data-id')">
+                            Correct
+                        </label>
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="7" class="text-center text-secondary">
+                        No payments found.
                     </td>
                 </tr>
-                </tbody>
 
+                </tbody>
             </table>
         </div>
 
     </div>
 </div>
 
-<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+<input type="checkbox" id="payment-edit-toggle" class="modal-toggle">
 
+<div class="modal-overlay">
+    <div class="modal-box">
+
+        <h2>Edit Payment</h2>
+
+        <form method="post" th:action="@{/admin/payment/correct}">
+            <!-- Payment ID -->
+            <input type="hidden" name="id" id="paymentId">
+
+            <label>Amount (€)</label>
+            <input class="form-control" type="number" name="amount" step="0.01" required>
+
+            <label>Status</label>
+            <select class="form-control" name="status" required>
+                <option value="PENDING">Pending</option>
+                <option value="SUCCESS">Paid</option>
+                <option value="CANCELED">Canceled</option>
+            </select>
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}" />
+
+            <div class="modal-actions">
+                <!-- Close modal -->
+                <label for="payment-edit-toggle" class="btn btn-outline-light">Cancel</label>
+
+                <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
 </body>
 </html>

@@ -14,6 +14,20 @@
         <div class="page-header">
             <h1>Your Contract History</h1>
             <p class="text-secondary">All past rental agreements</p>
+            <a class="admin-back-btn" th:href="@{/tenant/dashboard}">
+                ← Back
+            </a>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div class="page-section centered-card"
+             th:if="${history == null or history.size() == 0}">
+            <div class="payment-card card">
+                <div class="card-body">
+                    <h2>No Contracts Yet</h2>
+                    <p>You haven't rented any property yet.</p>
+                </div>
+            </div>
         </div>
 
         <div class="card">
@@ -35,11 +49,11 @@
                     <tr th:each="c : ${history}">
                         <td th:text="${c.property.title}"></td>
                         <td th:text="${c.property.city}"></td>
-                        <td th:text="${c.startDate}"></td>
-                        <td th:text="${c.endDate}"></td>
+                        <td th:text="${c.startDate != null ? #temporals.format(c.startDate, 'dd MMM yyyy HH:mm') : '—'}"></td>
+                        <td th:text="${c.endDate != null ? #temporals.format(c.endDate, 'dd MMM yyyy HH:mm') : '—'}"></td>
                         <td th:text="${c.monthlyRent + ' €'}"></td>
                         <td>
-                            <a th:href="@{'/tenant/payments?property=' + ${c.property.id}}"
+                            <a th:href="@{'/tenant/payments/contract/' + ${c.id}}"
                                class="btn btn-primary btn-sm">
                                 Payments
                             </a>

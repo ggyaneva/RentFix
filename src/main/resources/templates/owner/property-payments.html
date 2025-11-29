@@ -15,6 +15,9 @@
         <div class="page-header">
             <h1 th:text="${property.title}"></h1>
             <p class="text-secondary">Payment history for this property</p>
+            <a class="admin-back-btn" th:href="@{/owner/dashboard}">
+                ← Back
+            </a>
         </div>
 
         <!-- PAYMENTS TABLE -->
@@ -31,33 +34,28 @@
                 </thead>
 
                 <tbody>
-                <tr th:each="payment : ${payments}">
+                <tr th:each="p : ${payments}">
 
                     <!-- Tenant name -->
-                    <td th:text="${payment.contract.tenant.firstName + ' ' + payment.contract.tenant.lastName}">
-                    </td>
+                    <td th:text="${p.contract.tenant.firstName + ' ' + p.contract.tenant.lastName}"></td>
 
                     <!-- Amount -->
-                    <td th:text="${payment.amount}"></td>
+                    <td th:text="${p.amount}"></td>
 
-                    <!-- Due date -->
-                    <td th:text="${payment.dueDate}"></td>
+                    <!-- Due Date -->
+                    <td th:text="${#temporals.format(p.dueDate, 'dd MMM yyyy')}"></td>
 
                     <!-- Paid At -->
-                    <td th:text="${payment.paidAt != null ? payment.paidAt : '—'}"></td>
+                    <td th:text="${p.paidAt != null ? #temporals.format(p.paidAt, 'dd MMM yyyy HH:mm') : '—'}"></td>
 
-                    <!-- Status Badge -->
+                    <!-- Status -->
                     <td>
-                        <span th:if="${payment.status == 'SUCCESS'}" class="badge badge-success">
+                        <span th:if="${p.status.name() == 'SUCCESS'}" class="badge badge-success">
                             Paid
                         </span>
 
-                        <span th:if="${payment.status == 'PENDING'}" class="badge badge-warning">
+                        <span th:if="${p.status.name() == 'PENDING'}" class="badge badge-warning">
                             Pending
-                        </span>
-
-                        <span th:if="${payment.status == 'FAILED'}" class="badge badge-danger">
-                            Failed
                         </span>
                     </td>
 
@@ -65,18 +63,14 @@
 
                 <tr th:if="${#lists.isEmpty(payments)}">
                     <td colspan="5" class="text-center text-secondary">
-                        No payments found for this property.
+                        No payments found.
                     </td>
                 </tr>
-
                 </tbody>
+
             </table>
         </div>
 
-        <!-- Back Button -->
-        <a class="btn btn-outline-light mt-3" th:href="@{/owner/dashboard}">
-            Back to Dashboard
-        </a>
 
     </div>
 </div>

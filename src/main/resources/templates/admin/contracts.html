@@ -54,10 +54,10 @@
                     <td th:text="${c.monthlyRent}"></td>
 
                     <!-- Start Date -->
-                    <td th:text="${c.startDate}"></td>
+                    <td th:text="${#temporals.format(c.startDate, 'dd MMM yyyy')}"></td>
 
                     <!-- End Date -->
-                    <td th:text="${c.endDate != null ? c.endDate : 'Active'}"></td>
+                    <td th:text="${c.endDate != null ? #temporals.format(c.endDate, 'dd MMM yyyy') : '—'}"></td>
 
                     <!-- Status -->
                     <td>
@@ -68,17 +68,23 @@
 
                     <!-- Actions -->
                     <td>
-                        <form th:action="@{/admin/contract/delete/{id}(id=${c.id})}"
+                        <form th:action="@{/admin/contract/end/{id}(id=${c.id})}"
                               method="post" style="display:inline-block;">
                             <input type="hidden"
                                    th:name="${_csrf.parameterName}"
                                    th:value="${_csrf.token}"/>
                             <button class="btn btn-sm btn-danger" type="submit">
-                                Delete
+                                End Contract
                             </button>
                         </form>
                     </td>
 
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(contracts)}">
+                    <td colspan="5" class="text-center text-secondary">
+                        No contracts found.
+                    </td>
                 </tr>
                 </tbody>
 

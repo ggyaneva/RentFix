@@ -18,6 +18,9 @@
             <p class="text-secondary">
                 All rental contracts for this property
             </p>
+            <a class="admin-back-btn" th:href="@{/owner/dashboard}">
+                ← Back
+            </a>
         </div>
 
         <!-- CONTRACTS TABLE -->
@@ -41,10 +44,10 @@
                     <td th:text="${c.tenant.getFirstName() + ' ' + c.tenant.lastName}"></td>
 
                     <!-- START DATE -->
-                    <td th:text="${c.startDate}"></td>
+                    <td th:text="${#temporals.format(c.startDate, 'dd MMM yyyy')}"></td>
 
                     <!-- END DATE -->
-                    <td th:text="${c.endDate != null ? c.endDate : '—'}"></td>
+                    <td th:text="${c.endDate != null ? #temporals.format(c.endDate, 'dd MMM yyyy') : '—'}"></td>
 
                     <!-- MONTHLY RENT -->
                     <td th:text="${c.monthlyRent}"></td>
@@ -59,12 +62,12 @@
                     </td>
 
                     <!-- ACTION BUTTONS -->
-                    <td>
+                    <td class="center-actions">
                         <div style="display:flex; gap:0.5rem;">
 
                             <!-- Payments -->
                             <a class="btn btn-sm btn-primary"
-                               th:href="@{/owner/property/payments/{id}(id=${property.id})}">
+                               th:href="@{/owner/contract/payments/{id}(id=${c.id})}">
                                 Payments
                             </a>
 
@@ -81,13 +84,15 @@
                     </td>
 
                 </tr>
+
+                <tr th:if="${#lists.isEmpty(contracts)}">
+                    <td colspan="5" class="text-center text-secondary">
+                        No contracts found.
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
-
-        <a class="btn btn-outline-light mt-3" th:href="@{/owner/dashboard}">
-            Back to Dashboard
-        </a>
 
     </div>
 </div>

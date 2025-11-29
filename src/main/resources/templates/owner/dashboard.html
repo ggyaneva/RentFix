@@ -42,7 +42,6 @@
                     <th>City</th>
                     <th>Rent (€)</th>
                     <th>Status</th>
-                    <th>Contracts</th>
                     <th>Maintenance</th>
                     <th>Actions</th>
                 </tr>
@@ -65,14 +64,11 @@
                               th:if="${p.status.name() == 'RENTED'}">RENTED</span>
                     </td>
 
-                    <!-- Contracts (blue pill) -->
-                    <td><span class="pill-blue">0 requests</span></td>
-
                     <!-- Maintenance (blue circle) -->
                     <td><span class="circle-blue">0</span></td>
 
                     <!-- ACTIONS -->
-                    <td class="actions-cell">
+                    <td class="actions-cell center-actions">
                         <div class="actions-wrapper">
 
                             <!-- Payments BUTTON -->

@@ -72,6 +72,12 @@
                     </td>
 
                 </tr>
+
+                <tr th:if="${#lists.isEmpty(properties)}">
+                    <td colspan="5" class="text-center text-secondary">
+                        No properties found.
+                    </td>
+                </tr>
                 </tbody>
 
             </table>
