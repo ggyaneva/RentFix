@@ -27,25 +27,24 @@ public interface RentalContractRepository extends JpaRepository<RentalContract, 
     List<RentalContract> findByTenantId(UUID id);
 
     @Query("""
-    SELECT c FROM RentalContract c
-    WHERE c.tenant.id = :tenantId
-    ORDER BY 
-        CASE WHEN c.active = true THEN 0 ELSE 1 END,
-        c.endDate DESC
-    """)
+            SELECT c FROM RentalContract c
+            WHERE c.tenant.id = :tenantId
+            ORDER BY 
+                CASE WHEN c.active = true THEN 0 ELSE 1 END,
+                c.endDate DESC
+            """)
     List<RentalContract> findFullHistoryForTenant(UUID tenantId);
 
     @Query("""
-SELECT c FROM RentalContract c
-ORDER BY
-    CASE WHEN c.active = true THEN 0 ELSE 1 END,
-    CASE 
-        WHEN c.active = true THEN c.startDate 
-        ELSE c.endDate 
-    END DESC
-""")
+            SELECT c FROM RentalContract c
+            ORDER BY
+                CASE WHEN c.active = true THEN 0 ELSE 1 END,
+                CASE 
+                    WHEN c.active = true THEN c.startDate 
+                    ELSE c.endDate 
+                END DESC
+            """)
     List<RentalContract> findAllSorted();
-
 
 
 }

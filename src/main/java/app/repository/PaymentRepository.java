@@ -14,43 +14,41 @@ import java.util.UUID;
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     @Query("""
-    SELECT p FROM Payment p
-    WHERE p.contract.tenant.id = :tenantId
-    ORDER BY 
-        CASE WHEN p.status = 'PENDING' THEN 0 ELSE 1 END,
-        p.paidAt DESC
-    """)
+            SELECT p FROM Payment p
+            WHERE p.contract.tenant.id = :tenantId
+            ORDER BY 
+                CASE WHEN p.status = 'PENDING' THEN 0 ELSE 1 END,
+                p.paidAt DESC
+            """)
     List<Payment> getTenantPaymentsSorted(UUID tenantId);
 
 
     @Query("""
-    SELECT p FROM Payment p
-    WHERE p.contract.property.id = :propertyId
-    ORDER BY 
-        CASE WHEN p.status = 'PENDING' THEN 0 ELSE 1 END,
-        p.paidAt DESC
-    """)
+            SELECT p FROM Payment p
+            WHERE p.contract.property.id = :propertyId
+            ORDER BY 
+                CASE WHEN p.status = 'PENDING' THEN 0 ELSE 1 END,
+                p.paidAt DESC
+            """)
     List<Payment> getOwnerPaymentsSorted(UUID propertyId);
 
 
     @Query("""
-    SELECT p FROM Payment p
-    WHERE p.contract.id = :contractId
-    ORDER BY 
-        CASE WHEN p.status = 'PENDING' THEN 0 ELSE 1 END,
-        p.paidAt DESC
-    """)
+            SELECT p FROM Payment p
+            WHERE p.contract.id = :contractId
+            ORDER BY 
+                CASE WHEN p.status = 'PENDING' THEN 0 ELSE 1 END,
+                p.paidAt DESC
+            """)
     List<Payment> getContractPaymentsSorted(UUID contractId);
 
     @Query("""
-SELECT p FROM Payment p
-ORDER BY 
-    p.dueDate DESC,
-    p.paidAt DESC
-""")
+            SELECT p FROM Payment p
+            ORDER BY 
+                p.dueDate DESC,
+                p.paidAt DESC
+            """)
     List<Payment> findAllSorted();
-
-
 
 
     boolean existsByContractIdAndTypeAndDueDate(UUID id, PaymentType paymentType, LocalDate nextDue);
