@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Contract Payments - RentFix</title>
+    <th:block th:replace="~{fragments/header :: head}"></th:block>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-content">
+    <div class="container">
+
+        <div class="page-header">
+            <h1 th:text="${contract.property.title}"></h1>
+            <p class="text-secondary">
+                Payments for this rental contract
+            </p>
+            <a class="admin-back-btn" th:href="@{/owner/property/{id}/contracts(id=${contract.property.id})}">
+                ← Back
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Amount (€)</th>
+                    <th>Due Date</th>
+                    <th>Paid At</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="p : ${payments}">
+                    <td th:text="${p.amount}"></td>
+                    <td th:text="${p.dueDate}"></td>
+                    <td th:text="${p.paidAt != null ? #temporals.format(p.paidAt, 'dd MMM yyyy') : '—'}"></td>
+
+                    <td>
+                        <span th:if="${p.status == 'SUCCESS'}"
+                              class="badge badge-success">Paid</span>
+
+                        <span th:if="${p.status == 'PENDING'}"
+                              class="badge badge-warning">Pending</span>
+
+                        <span th:if="${p.status == 'FAILED'}"
+                              class="badge badge-danger">Failed</span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="5" class="text-center text-secondary">
+                        No payments found for this property.
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+</body>
+</html>
