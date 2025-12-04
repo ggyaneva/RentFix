@@ -49,8 +49,8 @@
                     <tr th:each="c : ${history}">
                         <td th:text="${c.property.title}"></td>
                         <td th:text="${c.property.city}"></td>
-                        <td th:text="${c.startDate != null ? #temporals.format(c.startDate, 'dd MMM yyyy HH:mm') : '—'}"></td>
-                        <td th:text="${c.endDate != null ? #temporals.format(c.endDate, 'dd MMM yyyy HH:mm') : '—'}"></td>
+                        <td th:text="${c.startDate != null ? #temporals.format(c.startDate, 'dd MMM yyyy') : '—'}"></td>
+                        <td th:text="${c.endDate != null ? #temporals.format(c.endDate, 'dd MMM yyyy') : '—'}"></td>
                         <td th:text="${c.monthlyRent + ' €'}"></td>
                         <td>
                             <a th:href="@{'/tenant/payments/contract/' + ${c.id}}"

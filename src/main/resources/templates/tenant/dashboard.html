@@ -15,11 +15,11 @@
         <!-- HEADER -->
         <div class="page-header">
             <h1>Your Rental Dashboard</h1>
-            <p class="text-secondary">Manage your home, contracts, and payments.</p>
+            <p class="text-secondary">Manage your home, contracts, maintenance and payments.</p>
         </div>
 
         <!-- NO ACTIVE CONTRACT -->
-        <div th:if="${activeContract == 0 || activeContract == null}" class="page-section">
+        <div th:if="${activeContract == null}" class="page-section">
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title">No Active Contract</h3>
@@ -38,7 +38,6 @@
 
         <!-- ACTIVE CONTRACT -->
         <div th:if="${activeContract != null}" class="page-section">
-
             <div class="card center-card">
                 <div class="card-body">
 
@@ -69,12 +68,7 @@
 
                         <div>
                             <p class="label">Start Date:</p>
-                            <p class="value" th:text="${activeContract.startDate}"></p>
-                        </div>
-
-                        <div th:if="${activeContract.endDate != null}">
-                            <p class="label">End Date:</p>
-                            <p class="value" th:text="${activeContract.endDate}"></p>
+                            <p class="value" th:text="${#temporals.format(activeContract.startDate, 'dd MMM yyyy') }"></p>
                         </div>
 
                     </div>
@@ -82,15 +76,17 @@
                     <!-- ACTION BUTTONS -->
                     <div class="contract-actions">
 
+                        <!-- Maintenance -->
+                        <a class="btn btn-primary" th:href="@{/tenant/maintenance}">
+                            Maintenance Requests
+                        </a>
+
                         <!-- Payment History -->
-                        <a class="btn btn-primary" th:href="@{/tenant/payments}">
+                        <a class="btn btn-secondary"
+                           th:href="@{/tenant/payments/contract/{id}(id=${activeContract.id})}">
                             Payment History
                         </a>
 
-                        <!-- Contract History -->
-                        <a class="btn btn-secondary" th:href="@{/contracts/history}">
-                            Contract History
-                        </a>
 
                         <!-- Cancel Contract -->
                         <form th:action="@{/contracts/cancel/{id}(id=${activeContract.id})}"
@@ -105,18 +101,14 @@
                             </button>
                         </form>
 
-
                     </div>
 
                 </div>
             </div>
-
         </div>
 
     </div>
-
-    </div>
-
+</div>
 
 <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 </body>

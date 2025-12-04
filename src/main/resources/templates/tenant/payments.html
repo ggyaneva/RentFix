@@ -18,7 +18,7 @@
                 View all your past and upcoming rent payments.
             </p>
             <a class="admin-back-btn" th:href="@{/tenant/dashboard}">
-                ← Back
+                ← Back to Dashboard
             </a>
         </div>
 
@@ -63,13 +63,13 @@
 
                     <!-- Status -->
                     <td>
-        <span th:if="${p.status.name() == 'SUCCESS'}" class="badge badge-success">
-            Paid
-        </span>
+                        <span th:if="${p.status.name() == 'SUCCESS'}" class="badge badge-success">
+                            Paid
+                        </span>
 
                         <span th:if="${p.status.name() == 'PENDING'}" class="badge badge-warning">
-            Pending
-        </span>
+                            Pending
+                        </span>
                     </td>
 
                     <!-- Paid At -->
