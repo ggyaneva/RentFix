@@ -23,10 +23,6 @@ public class PaymentScheduler {
     private final RentalContractRepository rentalContractRepository;
     private final PaymentRepository paymentRepository;
 
-    /**
-     * Runs every day at 06:00
-     * Generates ONE monthly rent payment for next month.
-     */
     @Scheduled(cron = "0 0 6 * * ?")
     public void generateMonthlyPayments() {
 
@@ -54,19 +50,41 @@ public class PaymentScheduler {
                 continue;
             }
 
-            Payment p = new Payment();
-            p.setId(UUID.randomUUID());
-            p.setContract(contract);
-            p.setAmount(contract.getMonthlyRent());
-            p.setDueDate(nextDue);
-            p.setStatus(PaymentStatus.PENDING);
-            p.setType(PaymentType.MONTHLY_RENT);
-            p.setPaidAt(null);
+            Payment payment = new Payment();
+            payment.setId(UUID.randomUUID());
+            payment.setContract(contract);
+            payment.setAmount(contract.getMonthlyRent());
+            payment.setDueDate(nextDue);
+            payment.setStatus(PaymentStatus.PENDING);
+            payment.setType(PaymentType.MONTHLY_RENT);
+            payment.setPaidAt(null);
 
-            paymentRepository.save(p);
+            paymentRepository.save(payment);
 
             log.info("[Scheduler] NEW monthly payment created for contract {} due at {}",
                     contract.getId(), nextDue);
+        }
+    }
+
+
+    @Scheduled(fixedDelay = 300_000)  // без cron, изискване №2
+    public void checkOverduePayments() {
+
+        log.info("[Scheduler] Checking for overdue payments...");
+
+        LocalDate today = LocalDate.now();
+
+        List<Payment> allPayments = paymentRepository.findAll();
+
+        long overdueCount = allPayments.stream()
+                .filter(p -> p.getStatus() == PaymentStatus.PENDING)
+                .filter(p -> p.getDueDate() != null && p.getDueDate().isBefore(today))
+                .count();
+
+        if (overdueCount > 0) {
+            log.warn("[Scheduler] Found {} overdue PENDING payments!", overdueCount);
+        } else {
+            log.info("[Scheduler] No overdue PENDING payments.");
         }
     }
 }
