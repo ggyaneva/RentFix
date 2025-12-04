@@ -66,6 +66,16 @@
 
                     <div><p class="text-secondary mb-1"><strong>Monthly Rent:</strong></p>
                         <p th:text="${property.monthlyRent} + ' €'"></p></div>
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Owner:</strong></p>
+                        <p th:text="${property.owner.firstName + ' ' + property.owner.lastName}"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-secondary mb-1"><strong>Owner Phone:</strong></p>
+                        <p th:text="${property.owner.phoneNumber}"></p>
+                    </div>
+
 
                 </div>
 
@@ -106,14 +116,9 @@
 </div>
 
 
-<!-- ========================================= -->
-<!--   HIDDEN CHECKBOX (NO-JS MODAL TOGGLE)    -->
-<!-- ========================================= -->
+
 <input type="checkbox" id="rent-modal-toggle" class="modal-toggle">
 
-<!-- ========================================= -->
-<!--                MODAL POPUP                -->
-<!-- ========================================= -->
 <div class="modal-overlay">
     <div class="modal-box">
 
