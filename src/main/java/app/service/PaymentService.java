@@ -1,5 +1,6 @@
 package app.service;
 
+import app.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import app.model.Payment;
@@ -10,6 +11,8 @@ import app.model.enums.PaymentType;
 import app.repository.PaymentRepository;
 import app.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -33,14 +36,16 @@ public class PaymentService {
         this.propertyRepository = propertyRepository;
     }
 
+    @Cacheable("payment")
     public List<Payment> getPaymentsForTenant(UUID tenantId) {
         return paymentRepository.getTenantPaymentsSorted(tenantId);
     }
 
+    @Cacheable("payment")
     public List<Payment> getPaymentsForProperty(UUID propertyId, UUID ownerId) {
 
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found"));
 
         if (!property.getOwner().getId().equals(ownerId)) {
             throw new AccessDeniedException("Unauthorized");
@@ -49,34 +54,37 @@ public class PaymentService {
         return paymentRepository.getOwnerPaymentsSorted(propertyId);
     }
 
-    public List<Payment> findByContract(UUID contractId) {
+    @Cacheable("payment")
+    public List<Payment> getByContract(UUID contractId) {
         return paymentRepository.getContractPaymentsSorted(contractId);
     }
 
 
     @Transactional
+    @CacheEvict(value = "payment", allEntries = true)
     public void pay(UUID paymentId, UUID tenantId) {
 
-        Payment p = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
-        if (!p.getContract().getTenant().getId().equals(tenantId)) {
+        if (!payment.getContract().getTenant().getId().equals(tenantId)) {
             throw new SecurityException("Unauthorized payment attempt");
         }
 
-        if (p.getStatus() != PaymentStatus.PENDING) {
+        if (payment.getStatus() != PaymentStatus.PENDING) {
             return;
         }
 
-        p.setStatus(PaymentStatus.SUCCESS);
-        p.setPaidAt(LocalDateTime.now());
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaidAt(LocalDateTime.now());
 
-        paymentRepository.save(p);
+        paymentRepository.save(payment);
 
         log.info("Payment {} marked as PAID by tenant {}", paymentId, tenantId);
     }
 
     @Transactional
+    @CacheEvict(value = "payment", allEntries = true)
     public void createInitialPaymentsForNewContract(RentalContract contract) {
 
         BigDecimal rent = contract.getMonthlyRent();
@@ -88,6 +96,7 @@ public class PaymentService {
     }
 
     @Transactional
+    @CacheEvict(value = "payment", allEntries = true)
     public void createFirstMonthlyRentPayment(RentalContract contract) {
 
         BigDecimal rent = contract.getMonthlyRent();
@@ -102,15 +111,15 @@ public class PaymentService {
                                LocalDate dueDate,
                                PaymentType type) {
 
-        Payment p = new Payment();
-        p.setContract(contract);
-        p.setAmount(amount);
-        p.setDueDate(dueDate);
-        p.setPaidAt(null);
-        p.setStatus(PaymentStatus.PENDING);
-        p.setType(type);
+        Payment payment = new Payment();
+        payment.setContract(contract);
+        payment.setAmount(amount);
+        payment.setDueDate(dueDate);
+        payment.setPaidAt(null);
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setType(type);
 
-        paymentRepository.save(p);
+        paymentRepository.save(payment);
     }
 
     private void createPaidPayment(RentalContract contract,
@@ -118,15 +127,15 @@ public class PaymentService {
                                    LocalDate dueDate,
                                    PaymentType type) {
 
-        Payment p = new Payment();
-        p.setContract(contract);
-        p.setAmount(amount);
-        p.setDueDate(dueDate);
-        p.setStatus(PaymentStatus.SUCCESS);
-        p.setPaidAt(LocalDateTime.now());
-        p.setType(type);
+        Payment payment = new Payment();
+        payment.setContract(contract);
+        payment.setAmount(amount);
+        payment.setDueDate(dueDate);
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaidAt(LocalDateTime.now());
+        payment.setType(type);
 
-        paymentRepository.save(p);
+        paymentRepository.save(payment);
     }
 
 }

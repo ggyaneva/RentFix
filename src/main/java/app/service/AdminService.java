@@ -15,8 +15,10 @@ import app.repository.PaymentRepository;
 import app.repository.PropertyRepository;
 import app.repository.RentalContractRepository;
 import app.repository.UserRepository;
-import app.web.dto.maintenance.MaintenanceResponse;
+import app.feign.dto.MaintenanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -48,23 +50,26 @@ public class AdminService {
         this.propertyService = propertyService;
     }
 
+    @Cacheable("admin")
     public List<User> getAllUsers() {
         log.info("Admin: fetching all users");
         return userRepository.findAll();
     }
 
+    @Cacheable("admin")
     public List<MaintenanceResponse> getAllMaintenance() {
         log.info("Admin: fetching all maintenance tickets");
-        //return maintenanceClient.getAll();
-        return List.of();
+        return maintenanceClient.getAll();
+
     }
 
-
+    @Cacheable("admin")
     public List<RentalContract> getAllContracts() {
         return rentalContractRepository.findAllSorted();
     }
 
     @Transactional
+    @CacheEvict(value = "admin", allEntries = true)
     public void endContract(UUID contractId) {
         RentalContract contract = rentalContractRepository.findById(contractId)
                 .orElseThrow(() -> new IllegalArgumentException("Contract not found"));
@@ -79,8 +84,8 @@ public class AdminService {
                 .filter(p -> p.getStatus() == PaymentStatus.PENDING)
                 .toList();
 
-        for (Payment p : futurePayments) {
-            p.setStatus(PaymentStatus.CANCELED);
+        for (Payment payment : futurePayments) {
+            payment.setStatus(PaymentStatus.CANCELED);
         }
 
         contract.getProperty().setStatus(Status.AVAILABLE);
@@ -88,39 +93,39 @@ public class AdminService {
         rentalContractRepository.save(contract);
     }
 
-
+    @Cacheable("admin")
     public List<Payment> getAllPayments() {
         return paymentRepository.findAllSorted();
     }
 
     @Transactional
+    @CacheEvict(value = "admin", allEntries = true)
     public void correctPayment(UUID id, BigDecimal amount, PaymentStatus status) {
 
-        Payment p = paymentRepository.findById(id)
+        Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
 
-        p.setAmount(amount);
-        p.setStatus(status);
+        payment.setAmount(amount);
+        payment.setStatus(status);
 
-        // ако е маркирано като "Paid", но няма paidAt → задаваме го
-        if (status == PaymentStatus.SUCCESS && p.getPaidAt() == null) {
-            p.setPaidAt(LocalDateTime.now());
+        if (status == PaymentStatus.SUCCESS && payment.getPaidAt() == null) {
+            payment.setPaidAt(LocalDateTime.now());
         }
 
-        // ако се върне в Pending → paidAt = null
         if (status == PaymentStatus.PENDING) {
-            p.setPaidAt(null);
+            payment.setPaidAt(null);
         }
 
-        paymentRepository.save(p);
+        paymentRepository.save(payment);
     }
 
-
+    @Cacheable("admin")
     public List<Property> getAllProperties() {
             return propertyRepository.findAll();
     }
 
     @Transactional
+    @CacheEvict(value = "admin", allEntries = true)
     public void deleteProperty(UUID id) {
 
         Property property = propertyRepository.findById(id)
@@ -133,6 +138,7 @@ public class AdminService {
 
 
     @Transactional
+    @CacheEvict(value = "admin", allEntries = true)
     public void deleteUser(UUID id) {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -153,9 +159,9 @@ public class AdminService {
                 }
 
                 List<Payment> payments = paymentRepository.findAll();
-                for (Payment p : payments) {
-                    if (p.getContract().getTenant().getId().equals(id)) {
-                        paymentRepository.delete(p);
+                for (Payment payment : payments) {
+                    if (payment.getContract().getTenant().getId().equals(id)) {
+                        paymentRepository.delete(payment);
                     }
                 }
             }

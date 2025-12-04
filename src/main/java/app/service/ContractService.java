@@ -1,5 +1,6 @@
 package app.service;
 
+import app.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import app.model.Property;
@@ -11,6 +12,8 @@ import app.repository.RentalContractRepository;
 import app.repository.UserRepository;
 import app.web.dto.ContractRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -35,6 +38,7 @@ public class ContractService {
     }
 
     @Transactional
+    @CacheEvict(value = {"contract", "property"}, allEntries = true)
     public void create(UUID propertyId, UUID tenantId, ContractRequest request) {
 
         //Tenant must NOT have an active contract
@@ -43,25 +47,25 @@ public class ContractService {
         }
 
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found"));
 
         if (property.getStatus() != Status.AVAILABLE) {
             throw new IllegalStateException("This property is already rented.");
         }
 
         User tenant = userRepository.findById(tenantId)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found"));
 
-        RentalContract c = new RentalContract();
-        c.setTenant(tenant);
-        c.setProperty(property);
-        c.setStartDate(request.getStartDate() == null ? LocalDate.now() : request.getStartDate());
-        c.setMonthlyRent(property.getMonthlyRent());
-        c.setActive(true);
+        RentalContract contract = new RentalContract();
+        contract.setTenant(tenant);
+        contract.setProperty(property);
+        contract.setStartDate(request.getStartDate() == null ? LocalDate.now() : request.getStartDate());
+        contract.setMonthlyRent(property.getMonthlyRent());
+        contract.setActive(true);
 
-        rentalContractRepository.save(c);
-        paymentService.createInitialPaymentsForNewContract(c);
-        paymentService.createFirstMonthlyRentPayment(c);
+        rentalContractRepository.save(contract);
+        paymentService.createInitialPaymentsForNewContract(contract);
+        paymentService.createFirstMonthlyRentPayment(contract);
 
         property.setStatus(Status.RENTED);
         propertyRepository.save(property);
@@ -69,47 +73,65 @@ public class ContractService {
     }
 
     @Transactional
+    @CacheEvict(value = {"contract", "property"}, allEntries = true)
     public void cancel(UUID contractId, UUID tenantId) {
 
-        RentalContract c = rentalContractRepository.findById(contractId)
-                .orElseThrow(() -> new IllegalArgumentException("Contract not found"));
+        RentalContract contract = rentalContractRepository.findById(contractId)
+                .orElseThrow(() -> new ResourceNotFoundException    ("Contract not found"));
 
-        if (!c.getTenant().getId().equals(tenantId)) {
+        if (!contract.getTenant().getId().equals(tenantId)) {
             throw new SecurityException("Unauthorized");
         }
 
-        if (!c.isActive()) {
+        if (!contract.isActive()) {
             return;
         }
 
-        c.setActive(false);
-        c.setEndDate(LocalDate.now());
-        rentalContractRepository.save(c);
-        Property property = c.getProperty();
+        contract.setActive(false);
+        contract.setEndDate(LocalDate.now());
+        rentalContractRepository.save(contract);
+        Property property = contract.getProperty();
         property.setStatus(Status.AVAILABLE);
         propertyRepository.save(property);
         log.info("Tenant {} moved out of contract {}", tenantId, contractId);
     }
 
+    @Cacheable(value = "contract", key = "#root.methodName + '_' + #tenantId")
     public RentalContract getActiveContract(UUID tenantId) {
         return rentalContractRepository.findByTenantIdAndActiveTrue(tenantId)
                 .orElse(null);
     }
 
+    @Cacheable(value = "contract", key = "#root.methodName + '_' + #tenantId")
     public List<RentalContract> getHistoryForTenant(UUID tenantId) {
         return rentalContractRepository.findByTenantIdOrderByStartDateDesc(tenantId);
     }
 
-    public List<RentalContract> getByProperty(UUID id) {
-        return rentalContractRepository.findByPropertyId(id);
+    @Cacheable(value = "contract", key = "#root.methodName + '_' + #propertyId")
+    public List<RentalContract> getByProperty(UUID propertyId) {
+        return rentalContractRepository.findByPropertyId(propertyId);
     }
 
-
+    @Cacheable(value = "contract", key = "#root.methodName + '_' + #contractId")
     public RentalContract getById(UUID contractId) {
         return rentalContractRepository.getById(contractId);
     }
+
+    @Cacheable(value = "contract", key = "#root.methodName + '_' + #tenantId")
     public List<RentalContract> getFullHistoryForTenant(UUID tenantId) {
         return rentalContractRepository.findFullHistoryForTenant(tenantId);
     }
+
+    @Cacheable(value = "contract", key = "#root.methodName + '_' + #userId")
+    public UUID getActivePropertyId(UUID userId) {
+
+        RentalContract contract = rentalContractRepository
+                .findByTenantIdAndActiveTrue(userId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Tenant does not have an active rental contract"));
+
+        return contract.getProperty().getId();
+    }
+
 
 }
