@@ -1,5 +1,5 @@
 package app.model.enums;
 
 public enum Status {
-    RENTED, AVAILABLE, MAINTENANCE
+    RENTED, AVAILABLE
 }
