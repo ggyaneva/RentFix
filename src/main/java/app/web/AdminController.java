@@ -3,6 +3,7 @@ package app.web;
 
 import app.model.enums.PaymentStatus;
 import app.service.AdminService;
+import app.service.MaintenanceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -17,10 +18,12 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
+    private final MaintenanceFacade maintenanceFacade;
 
     @Autowired
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, MaintenanceFacade maintenanceFacade) {
         this.adminService = adminService;
+        this.maintenanceFacade = maintenanceFacade;
     }
 
     @GetMapping("/dashboard")
@@ -34,6 +37,7 @@ public class AdminController {
         modelAndView.addObject("contracts", adminService.getAllContracts());
         modelAndView.addObject("payments", adminService.getAllPayments());
         modelAndView.addObject("maintenanceList", adminService.getAllMaintenance());
+        modelAndView.addObject("maintenanceCount", maintenanceFacade.getAll().size());
 
         modelAndView.addObject("currentPath", "/admin/dashboard");
 

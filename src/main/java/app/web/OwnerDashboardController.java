@@ -5,6 +5,7 @@ import app.model.Property;
 import app.model.RentalContract;
 import app.security.UserData;
 import app.service.ContractService;
+import app.service.MaintenanceFacade;
 import app.service.PaymentService;
 import app.service.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -25,24 +27,33 @@ public class OwnerDashboardController {
     private final PropertyService propertyService;
     private final ContractService contractService;
     private final PaymentService paymentService;
+    private final MaintenanceFacade maintenanceFacade;
 
     @Autowired
-    public OwnerDashboardController(PropertyService propertyService, ContractService contractService, PaymentService paymentService) {
+    public OwnerDashboardController(PropertyService propertyService, ContractService contractService, PaymentService paymentService, MaintenanceFacade maintenanceFacade) {
         this.propertyService = propertyService;
         this.contractService = contractService;
         this.paymentService = paymentService;
+        this.maintenanceFacade = maintenanceFacade;
     }
 
     @GetMapping("/dashboard")
-    public ModelAndView dashboard(@AuthenticationPrincipal UserData user) {
+    public ModelAndView dashboard(@AuthenticationPrincipal UserData owner) {
 
-        List<Property> properties = propertyService.getByOwner(user.getUserId());
+        List<Property> properties = propertyService.getByOwner(owner.getUserId());
+
+        int maintenanceCount = maintenanceFacade.getCountForOwner(owner.getUserId());
+        Map<UUID, Long> maintenanceCountMap =
+                maintenanceFacade.getCountsByPropertyForOwner(owner.getUserId());
+
         ModelAndView modelAndView = new ModelAndView("owner/dashboard");
         modelAndView.addObject("properties", properties);
+        modelAndView.addObject("maintenanceCount", maintenanceCount);
+        modelAndView.addObject("maintenanceCountMap", maintenanceCountMap);
         modelAndView.addObject("currentPath", "/owner/dashboard");
-
         return modelAndView;
     }
+
 
     @GetMapping("/property/{id}/contracts")
     public ModelAndView propertyContracts(@PathVariable UUID id,
@@ -77,7 +88,7 @@ public class OwnerDashboardController {
     public ModelAndView contractPayments(@PathVariable UUID contractId) {
 
         RentalContract contract = contractService.getById(contractId);
-        List<Payment> payments = paymentService.findByContract(contractId);
+        List<Payment> payments = paymentService.getByContract(contractId);
 
         ModelAndView modelAndView = new ModelAndView("owner/contract-payments");
         modelAndView.addObject("contract", contract);
