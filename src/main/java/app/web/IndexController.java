@@ -60,16 +60,5 @@ public class IndexController {
         return new ModelAndView("redirect:auth/login");
     }
 
-//    @GetMapping("/redirect-by-role")
-//    public String redirectByRole(@AuthenticationPrincipal UserData user) {
-//
-//        return switch (user.getRole()) {
-//            case ADMIN -> "redirect:/admin/dashboard";
-//            case OWNER -> "redirect:/owner/dashboard";
-//            case TENANT -> "redirect:/tenant/dashboard";
-//            default -> "redirect:/";
-//        };
-//    }
-
 
 }

@@ -47,6 +47,7 @@
 
             modelAndView.addObject("contracts",
                     contractService.getHistoryForTenant(user.getUserId()));
+            
 
             modelAndView.addObject("currentPath", "/tenant/dashboard");
 
@@ -90,13 +91,12 @@
         public ModelAndView paymentsForContract(@PathVariable UUID contractId,
                                                 @AuthenticationPrincipal UserData user) {
 
-            // Проверка, че договорът е на този tenant
             RentalContract contract = contractService.getById(contractId);
             if (!contract.getTenant().getId().equals(user.getUserId())) {
                 throw new SecurityException("Unauthorized");
             }
 
-            List<Payment> payments = paymentService.findByContract(contractId);
+            List<Payment> payments = paymentService.getByContract(contractId);
 
             ModelAndView modelAndView = new ModelAndView("tenant/payments");
             modelAndView.addObject("payments", payments);
@@ -105,8 +105,6 @@
 
             return modelAndView;
         }
-
-
 
     }
 

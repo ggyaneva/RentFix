@@ -15,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.UUID;
 
 @Controller
-
 @RequestMapping("/properties")
 public class PropertyController {
 
