@@ -32,7 +32,6 @@ public class SecurityConfiguration {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // REGISTER authentication provider
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -41,7 +40,6 @@ public class SecurityConfiguration {
         return provider;
     }
 
-    // REGISTER auth manager for Spring Security 6
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder auth =
