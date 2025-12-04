@@ -15,10 +15,7 @@
         <!-- HEADER -->
         <div class="page-header">
             <h1>Admin Dashboard</h1>
-            <p class="text-secondary">
-                Manage users, properties, contracts and payments.
-            </p>
-
+            <p class="text-secondary">Manage users, properties, contracts, payments and maintenance.</p>
         </div>
 
         <!-- STAT CARDS -->
@@ -33,7 +30,7 @@
 
             <div class="card">
                 <h4 class="card-title">Properties</h4>
-                <p class="text-secondary">Active properties in the system</p>
+                <p class="text-secondary">Active properties</p>
                 <h2 th:text="${properties.size()}"></h2>
                 <a class="btn btn-primary mt-2" th:href="@{/admin/properties}">View Properties</a>
             </div>
@@ -47,14 +44,22 @@
 
             <div class="card">
                 <h4 class="card-title">Payments</h4>
-                <p class="text-secondary">Processed monthly payments</p>
+                <p class="text-secondary">Processed payments</p>
                 <h2 th:text="${payments.size()}"></h2>
                 <a class="btn btn-primary mt-2" th:href="@{/admin/payments}">View Payments</a>
             </div>
 
+
+            <div class="card">
+                <h4 class="card-title">Maintenance</h4>
+                <p class="text-secondary">System-wide maintenance requests</p>
+                <h2 th:text="${maintenanceCount}"></h2>
+                <a class="btn btn-primary mt-2" th:href="@{/admin/maintenance}">View Maintenance</a>
+            </div>
+
         </div>
 
-        <!-- USERS TABLE PREVIEW -->
+        <!-- USERS PREVIEW -->
         <div class="page-section">
             <h3>Latest Users</h3>
 
@@ -75,7 +80,6 @@
                         <td><span class="badge" th:text="${u.role}"></span></td>
                     </tr>
                     </tbody>
-
                 </table>
             </div>
 
